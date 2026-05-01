@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CI/CD Demo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main>
+        <h1>CI/CD Demo</h1>
+        <p>This page is auto-deployed from GitHub to GitHub Pages on every push to <code>main</code>.</p>
+        <p>The values below are injected by the GitHub Actions workflow at deploy time. If they update after a push, the pipeline is working.</p>
+        <dl>
+            <dt>Last deploy</dt>
+            <dd id="deploy-time">__DEPLOY_TIME__</dd>
+            <dt>Commit</dt>
+            <dd id="commit-sha"><code>__COMMIT_SHA__</code></dd>
+        </dl>
+    </main>
+</body>
+</html>

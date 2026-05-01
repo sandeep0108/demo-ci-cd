@@ -1,0 +1,52 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Inject deploy timestamp and commit SHA
+        run: |
+          DEPLOY_TIME="$(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+          SHORT_SHA="${GITHUB_SHA::7}"
+          sed -i "s|__DEPLOY_TIME__|${DEPLOY_TIME}|g" index.html
+          sed -i "s|__COMMIT_SHA__|${SHORT_SHA}|g" index.html
+
+      - name: Verify placeholders were replaced
+        run: |
+          if grep -q '__DEPLOY_TIME__\|__COMMIT_SHA__' index.html; then
+            echo "ERROR: placeholders still present in index.html after substitution"
+            exit 1
+          fi
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
